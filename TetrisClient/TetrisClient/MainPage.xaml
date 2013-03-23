@@ -371,6 +371,23 @@
 
         <sdk:Label x:Name="lblScore" HorizontalAlignment="Right" Height="86" VerticalAlignment="Top" Width="218" Margin="0,41,10,0" Foreground="#FFF4F4F5" Content="0" FontSize="70" FontFamily="Euphemia"/>
         <sdk:Label x:Name="lblName" HorizontalAlignment="Right" Height="51" VerticalAlignment="Top" Width="228" Margin="0,14,10,0" Foreground="#FFF4F4F5" Content="Simon" FontSize="35" FontFamily="Euphemia"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="335,283,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="356,283,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="377,283,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="398,283,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="335,304,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="356,304,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="377,304,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="398,304,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="335,325,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="356,325,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="377,325,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="398,325,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="335,346,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="356,346,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="377,346,0,0"/>
+        <Rectangle Fill="#FFF4F4F5 " HorizontalAlignment="Left" Height="20" Stroke="#FF514C4C" VerticalAlignment="Top" Width="20" Margin="398,346,0,0"/>
+        <sdk:Label x:Name="lblNextShape" HorizontalAlignment="Right" Height="29" VerticalAlignment="Top" Width="117" Margin="0,253,61,0" Foreground="#FFF4F4F5" Content="NextShape:" FontSize="20" FontFamily="Euphemia"/>
 
     </Grid>
 </UserControl>
