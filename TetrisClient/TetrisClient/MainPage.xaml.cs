@@ -53,6 +53,8 @@ namespace TetrisClient
 
             displayBoard.RemoveRange(360, 16);
 
+            
+
             StartTimer(null, null);
         }
 
@@ -63,11 +65,13 @@ namespace TetrisClient
             myDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 5); // 100 Milliseconds 
             myDispatcherTimer.Tick += new EventHandler(Each_Tick);
             myDispatcherTimer.Start();
+
         }
 
         // Raised every 100 miliseconds while the DispatcherTimer is active.
         private void Each_Tick(object o, EventArgs sender)
         {
+            HtmlPage.Plugin.Focus(); //let the silverlight plugin take focus - this makes the keyboard presses work without first clicking in the window
 
             if ((Ycounter * boardWidth) + Xcounter < displayBoard.Count)
             {
