@@ -24,7 +24,7 @@ namespace TetrisClient
         int Ycounter = 0; //counter for testing grid
         int lineCounter = 0;
 
-        private string name;
+        private string name = "Unknown";
         private int boardWidth = 12;
         private int nextShapeBoxWidth = 4;
 
@@ -33,7 +33,10 @@ namespace TetrisClient
         {
             InitializeComponent();
 
-            //name = HtmlPage.Document.QueryString["Name"];
+            if (HtmlPage.Document.QueryString.ContainsKey("Name"))
+                name = HtmlPage.Document.QueryString["Name"]; 
+            
+      
             lblName.Content = name;
 
             displayBoard = new List<Rectangle>();
