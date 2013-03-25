@@ -11,32 +11,40 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Browser;
+using TetrisClient.TetrisWebService;
+using System.Net.Browser;
 
 
 namespace TetrisClient
 {
     public partial class MainPage : UserControl
     {
+       
+        
         List<Rectangle> displayBoard;
         List<Rectangle> nextShapeBoard;
-
-        int Xcounter = 0; //counter for testing grid
-        int Ycounter = 0; //counter for testing grid
-        int lineCounter = 0;
+        TetrisWebServiceSoapClient webService = new TetrisWebServiceSoapClient();
+        System.Windows.Threading.DispatcherTimer myDispatcherTimer;
 
         private string name = "Unknown";
         private int boardWidth = 12;
         private int nextShapeBoxWidth = 4;
 
-
         public MainPage()
         {
             InitializeComponent();
-
+           
             if (HtmlPage.Document.QueryString.ContainsKey("Name"))
-                name = HtmlPage.Document.QueryString["Name"]; 
+                name = HtmlPage.Document.QueryString["Name"];
+
+            webService.StartGameCompleted += new EventHandler<StartGameCompletedEventArgs>(webService_StartGameCompleted);
+            webService.MoveBlockDownCompleted += new EventHandler<MoveBlockDownCompletedEventArgs>(webService_MoveBlockDownCompleted);
+            webService.HelloWorldCompleted += new EventHandler<HelloWorldCompletedEventArgs>(webService_HelloWorldCompleted);
+            webService.DropBlockCompleted += new EventHandler<DropBlockCompletedEventArgs>(WebService_DropBlockCompleted);
+            webService.MoveBlockLeftCompleted += new EventHandler<MoveBlockLeftCompletedEventArgs>(WebService_MoveBlockLeftCompleted);
+            webService.MoveBlockRightCompleted += new EventHandler<MoveBlockRightCompletedEventArgs>(WebService_MoveBlockRightCompleted);
+            webService.RotateBlockCompleted += new EventHandler<RotateBlockCompletedEventArgs>(WebService_RotateBlockCompleted);
             
-      
             lblName.Content = name;
 
             displayBoard = new List<Rectangle>();
@@ -55,8 +63,8 @@ namespace TetrisClient
                 nextShapeBoard.Add(displayBoard[i]);
 
             displayBoard.RemoveRange(360, 16);
-
-            
+           // displayBoard.Reverse();
+           // webService.HelloWorldAsync();
 
             StartTimer(null, null);
         }
@@ -64,10 +72,13 @@ namespace TetrisClient
         //taken from http://msdn.microsoft.com/en-us/library/cc189084%28v=vs.95%29.aspx
         private void StartTimer(object o, RoutedEventArgs sender)
         {
-            System.Windows.Threading.DispatcherTimer myDispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            myDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 5); // 100 Milliseconds 
+            myDispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            myDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000); // 100 Milliseconds 
             myDispatcherTimer.Tick += new EventHandler(Each_Tick);
+
+            webService.StartGameAsync(name);
             myDispatcherTimer.Start();
+            
 
         }
 
@@ -75,55 +86,16 @@ namespace TetrisClient
         private void Each_Tick(object o, EventArgs sender)
         {
             HtmlPage.Plugin.Focus(); //let the silverlight plugin take focus - this makes the keyboard presses work without first clicking in the window
-
-            if ((Ycounter * boardWidth) + Xcounter < displayBoard.Count)
-            {
-                //this code is only to demonstrate and test the order the squares are filled - can be removed in the release
-                SolidColorBrush blackBrush = new SolidColorBrush();
-                blackBrush.Color = Colors.Black;
-                
-                displayBoard[(Ycounter * boardWidth) + Xcounter].Fill = blackBrush;
-
-                Xcounter++;
-                lineCounter++;
-
-                if (lineCounter == 12)
-                {
-                    lineCounter = 0;
-                    Ycounter++;
-                    Xcounter = 0;
-                }
-            }
-            else
-            {
-                //this code is the real implementation and must stay in the release - the getArray() method will be called here every second.  
-                //getArray will get the updated array from the web service
-                string[][] webServiceArray = getArray();
-
-                for (int x = 0; x < webServiceArray.Count(); x++)
-                {
-                    for (int y = 0; y < webServiceArray[x].Count(); y++)
-                    {
-                       displayBoard[(y * boardWidth) + x].Fill = getBrush(webServiceArray[x][y]);
-                    }
-                }
-
-                string[][] nextShape = getNextShape();
-                for (int x = 0; x < nextShape.Count(); x++)
-                {
-                    for (int y = 0; y < nextShape[x].Count(); y++)
-                    {
-                        nextShapeBoard[(y * nextShapeBoxWidth) + x].Fill = getBrush(nextShape[x][y]);
-                    }
-                }
-
-
-            }
+            
+            webService.MoveBlockDownAsync();
+           
         }
 
         //taken from http://stackoverflow.com/questions/6211388/how-to-convert-00e4ff-to-brush-in-code
         private SolidColorBrush getBrush(string hex)
         {
+            if (hex == "")
+                hex = "FFFFFF";
 
             byte r = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
             byte g = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
@@ -172,33 +144,148 @@ namespace TetrisClient
             return webServiceData;
         }
 
+        private void updateBoard(string[][] webServiceArray)
+        {
+            for (int x = 0; x < webServiceArray.Count(); x++)
+            {
+                for (int y = 0; y < webServiceArray[x].Count(); y++)
+                {
+                    lblName.Content = x + "," + y;
+                    displayBoard[(y * boardWidth) + x].Fill = getBrush(webServiceArray[x][y]);
+                }
+            }
+
+            displayBoard[0].Fill = getBrush(webServiceArray[0][0]);
+           // lblName.Content = webServiceArray[0][0];
+
+        }
+
+        private void updateNextShapeBoard(string[][] board)
+        {
+            string[][] nextShape = getNextShape();
+            for (int x = 0; x < nextShape.Count(); x++)
+            {
+                for (int y = 0; y < nextShape[x].Count(); y++)
+                {
+                    nextShapeBoard[(y * nextShapeBoxWidth) + x].Fill = getBrush(nextShape[x][y]);
+                }
+            }
+        }
+
         private void UserControl_KeyDown_1(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.Down:
                     //call game.down() on the web service
-                    lblScore.Content = "down";
-                    Each_Tick(null, null); //this should refresh the grid to make the change quicker
+                    webService.DropBlockAsync();
                     break;
                 case Key.Left:
                     //call game.left() on the web service
-                    lblScore.Content = "left";
-                    Each_Tick(null, null);
+                    webService.MoveBlockLeftAsync();
                     break;
                 case Key.Right:
                     //call game.right() on the web service
-                    lblScore.Content = "right";
-                    Each_Tick(null, null);
+                    webService.MoveBlockRightAsync();
                     break;
                 case Key.Up:
                     //call game.rotate() on the web service
-                    lblScore.Content = "rotate";
-                    Each_Tick(null, null);
+                    webService.RotateBlockAsync();
                     break;
                 default:
                     break;
             }
+        }
+
+        private void webService_MoveBlockDownCompleted(object sender, MoveBlockDownCompletedEventArgs e)
+        {
+            lblScore.Content = e.Result.Count();
+            updateBoard(e.Result);
+           // updateBoard(getArray());
+        }
+
+        private void webService_StartGameCompleted(object sender, StartGameCompletedEventArgs e)
+        {
+            try
+            {
+                //updateBoard(getArray());
+            updateBoard(e.Result);
+           // myDispatcherTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                lblScore.Content = e.Result.Count() * e.Result[0].Count(); ;
+                lblTest.Content = ex.ToString();
+               
+            }
+            
+        }
+
+        private void WebService_DropBlockCompleted(object sender, DropBlockCompletedEventArgs e)
+        {
+            try
+            {
+                updateBoard(e.Result);
+            }
+            catch (Exception ex)
+            {
+                
+                 lblTest.Content = (ex.ToString());
+            }
+        }
+
+        private void WebService_MoveBlockLeftCompleted(object sender, MoveBlockLeftCompletedEventArgs e)
+        {
+            try
+            {
+                updateBoard(e.Result);
+            }
+            catch (Exception ex)
+            {
+
+                lblTest.Content = (ex.ToString());
+            }
+        }
+
+         private void WebService_MoveBlockRightCompleted(object sender, MoveBlockRightCompletedEventArgs e)
+        {
+            try
+            {
+                updateBoard(e.Result);
+            }
+            catch (Exception ex)
+            {
+
+                lblTest.Content = (ex.ToString());
+            }
+        }
+
+         private void WebService_RotateBlockCompleted(object sender, RotateBlockCompletedEventArgs e)
+         {
+             try
+             {
+                 updateBoard(e.Result);
+             }
+             catch (Exception ex)
+             {
+
+                 lblTest.Content = (ex.ToString());
+             }
+         }
+
+        private void webService_HelloWorldCompleted(object sender, HelloWorldCompletedEventArgs e)
+        {
+            try
+            {
+                lblScore.Content = e.Result.ToString();
+            }
+            catch (Exception Ex)
+            {
+
+                lblTest.Content = (Ex.ToString()); 
+            }
+            
+            lblName.Content = "test";
         }
     }
 }
