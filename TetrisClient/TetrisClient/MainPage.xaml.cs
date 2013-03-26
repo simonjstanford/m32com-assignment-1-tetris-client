@@ -19,82 +19,145 @@ namespace TetrisClient
 {
     public partial class MainPage : UserControl
     {
-       
-        
-        List<Rectangle> displayBoard;
-        List<Rectangle> nextShapeBoard;
         TetrisWebServiceSoapClient webService = new TetrisWebServiceSoapClient();
-        System.Windows.Threading.DispatcherTimer myDispatcherTimer;
 
         private string name = "Unknown";
-        private int boardWidth = 12;
-        private int nextShapeBoxWidth = 4;
+
+        //board fields
+        Rectangle[][] gameBoard;
+        Rectangle[][] nextShapeBoard;
+        StackPanel panel = new StackPanel();
+            
 
         public MainPage()
         {
             InitializeComponent();
-           
+
+            //retrieve and use name from query string       
             if (HtmlPage.Document.QueryString.ContainsKey("Name"))
                 name = HtmlPage.Document.QueryString["Name"];
+            lblName.Content = name;
 
+            //add web service event handlers
             webService.StartGameCompleted += new EventHandler<StartGameCompletedEventArgs>(webService_StartGameCompleted);
             webService.MoveBlockDownCompleted += new EventHandler<MoveBlockDownCompletedEventArgs>(webService_MoveBlockDownCompleted);
-            webService.HelloWorldCompleted += new EventHandler<HelloWorldCompletedEventArgs>(webService_HelloWorldCompleted);
             webService.DropBlockCompleted += new EventHandler<DropBlockCompletedEventArgs>(WebService_DropBlockCompleted);
             webService.MoveBlockLeftCompleted += new EventHandler<MoveBlockLeftCompletedEventArgs>(WebService_MoveBlockLeftCompleted);
             webService.MoveBlockRightCompleted += new EventHandler<MoveBlockRightCompletedEventArgs>(WebService_MoveBlockRightCompleted);
             webService.RotateBlockCompleted += new EventHandler<RotateBlockCompletedEventArgs>(WebService_RotateBlockCompleted);
-            
-            lblName.Content = name;
+            webService.GetScoreCompleted += new EventHandler<GetScoreCompletedEventArgs>(WebService_GetScoreCompleted);
+            webService.GetNextShapeCompleted += new EventHandler<GetNextShapeCompletedEventArgs>(WebService_GetNextShapeCompleted);
 
-            displayBoard = new List<Rectangle>();
-            nextShapeBoard = new List<Rectangle>();
 
-            //detect the rectangles and put them in a list - either the board or the next shape box
-            foreach (UIElement child in LayoutRoot.Children)
-            {
-                if (child is Rectangle)
-                {
-                    displayBoard.Add((Rectangle)child);
-                }
-            }
-
-            for (int i = 360; i < displayBoard.Count; i++)
-                nextShapeBoard.Add(displayBoard[i]);
-
-            displayBoard.RemoveRange(360, 16);
-           // displayBoard.Reverse();
-           // webService.HelloWorldAsync();
-
-            StartTimer(null, null);
-        }
-
-        //taken from http://msdn.microsoft.com/en-us/library/cc189084%28v=vs.95%29.aspx
-        private void StartTimer(object o, RoutedEventArgs sender)
-        {
-            myDispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            myDispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000); // 100 Milliseconds 
-            myDispatcherTimer.Tick += new EventHandler(Each_Tick);
-
+            //start game
             webService.StartGameAsync(name);
-            myDispatcherTimer.Start();
-            
 
         }
 
-        // Raised every 100 miliseconds while the DispatcherTimer is active.
+        // Raised every second while the DispatcherTimer is active.
         private void Each_Tick(object o, EventArgs sender)
         {
             HtmlPage.Plugin.Focus(); //let the silverlight plugin take focus - this makes the keyboard presses work without first clicking in the window
-            
+
             webService.MoveBlockDownAsync();
-           
+            webService.GetNextShapeAsync();
+            webService.GetScoreAsync();
+
+        }
+
+        //taken from http://msdn.microsoft.com/en-us/library/cc189084%28v=vs.95%29.aspx
+        private void webService_StartGameCompleted(object sender, StartGameCompletedEventArgs e)
+        {
+            try
+            {
+                gameBoard = createBoard(e.Result, 6, 619);
+
+                webService.GetNextShapeAsync();
+                updateBoard(e.Result, gameBoard);
+
+                System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
+                timer.Interval = new TimeSpan(0, 0, 0, 0, 1000); // 1 second 
+                timer.Tick += new EventHandler(Each_Tick);
+
+
+                timer.Start();
+            }
+            catch (Exception ex)
+            {
+                lblTest.Content = ex.ToString();
+            }
+        }
+
+        private void WebService_GetNextShapeCompleted(object sender, GetNextShapeCompletedEventArgs e)
+        {
+            try
+            {
+                if (nextShapeBoard == null)
+                    nextShapeBoard = createBoard(e.Result, 284, 73);
+
+                else
+                    updateBoard(e.Result, nextShapeBoard);
+
+            }
+            catch (Exception ex)
+            {
+
+                lblTest.Content = (ex.ToString());
+            }
+        }
+
+        #region Board Update and Brush Methods
+
+        private Rectangle[][] createBoard(string[][] webServiceArray, int RectangleX, int RectangleY)
+        {
+            Rectangle[][] displayArray = new Rectangle[webServiceArray.Count()][];
+            int intitalYValue = RectangleY;
+
+            for (int x = 0; x < displayArray.Count(); x++)
+            {
+                displayArray[x] = new Rectangle[webServiceArray[x].Count()];
+
+                for (int y = 0; y < webServiceArray[x].Count(); y++)
+                {
+                    Rectangle rectangle = new Rectangle();
+                    rectangle.Fill = getBrush("FFF4F4F5");
+                    rectangle.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                    rectangle.Height = 20;
+                    rectangle.Stroke = getBrush("FF514C4C");
+                    rectangle.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    rectangle.Width = 20;
+
+                    rectangle.Margin = new Thickness(RectangleX, RectangleY, 0, 0);
+
+                    displayArray[x][y] = rectangle;
+
+                    RectangleY -= 21;
+
+                    this.LayoutRoot.Children.Add(rectangle);
+                }
+
+                RectangleY = intitalYValue;
+                RectangleX += 21;
+            }
+
+            return displayArray;
+        }
+
+        private void updateBoard(string[][] webServiceArray, Rectangle[][] displayArray)
+        {
+            for (int x = 0; x < webServiceArray.Count(); x++)
+            {
+                for (int y = 0; y < webServiceArray[x].Count(); y++)
+                {
+                    displayArray[x][y].Fill = getBrush(webServiceArray[x][y]);
+                }
+            }
         }
 
         //taken from http://stackoverflow.com/questions/6211388/how-to-convert-00e4ff-to-brush-in-code
         private SolidColorBrush getBrush(string hex)
         {
-            if (hex == "")
+            if (hex == "" || hex == null)
                 hex = "FFFFFF";
 
             byte r = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
@@ -106,71 +169,9 @@ namespace TetrisClient
             return myBrush;
         }
 
-        //a test method - should request the string array from the web service for the board
-        private string[][] getArray()
-        {
-            string[][] webServiceData = new string[12][];
-            webServiceData[11] = new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[10] = new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[9] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[8] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[7] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "800080", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[6] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "800080", "800080", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[5] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "800080", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[4] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[3] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[2] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[1] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };          
-            webServiceData[0] =  new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF",};
+        #endregion
 
-            
-
-
-            return webServiceData;
-        }
-
-        //a test method - should request the string array from the web service for the next shape
-        private string[][] getNextShape()
-        {
-            string[][] webServiceData = new string[4][];
-            webServiceData[3] = new string[] { "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", };
-            webServiceData[2] = new string[] { "FFFFFF", "FFFFFF", "FF0000", "FFFFFF", };
-            webServiceData[1] = new string[] { "FFFFFF", "FF0000", "FF0000", "FFFFFF", };
-            webServiceData[0] = new string[] { "FFFFFF", "FF0000", "FFFFFF", "FFFFFF", };
-
-
-
-
-            return webServiceData;
-        }
-
-        private void updateBoard(string[][] webServiceArray)
-        {
-            for (int x = 0; x < webServiceArray.Count(); x++)
-            {
-                for (int y = 0; y < webServiceArray[x].Count(); y++)
-                {
-                    lblName.Content = x + "," + y;
-                    displayBoard[(y * boardWidth) + x].Fill = getBrush(webServiceArray[x][y]);
-                }
-            }
-
-            displayBoard[0].Fill = getBrush(webServiceArray[0][0]);
-           // lblName.Content = webServiceArray[0][0];
-
-        }
-
-        private void updateNextShapeBoard(string[][] board)
-        {
-            string[][] nextShape = getNextShape();
-            for (int x = 0; x < nextShape.Count(); x++)
-            {
-                for (int y = 0; y < nextShape[x].Count(); y++)
-                {
-                    nextShapeBoard[(y * nextShapeBoxWidth) + x].Fill = getBrush(nextShape[x][y]);
-                }
-            }
-        }
+        #region Web Service Block Movement Methods
 
         private void UserControl_KeyDown_1(object sender, KeyEventArgs e)
         {
@@ -199,38 +200,19 @@ namespace TetrisClient
 
         private void webService_MoveBlockDownCompleted(object sender, MoveBlockDownCompletedEventArgs e)
         {
-            lblScore.Content = e.Result.Count();
-            updateBoard(e.Result);
-           // updateBoard(getArray());
-        }
-
-        private void webService_StartGameCompleted(object sender, StartGameCompletedEventArgs e)
-        {
-            try
-            {
-                //updateBoard(getArray());
-            updateBoard(e.Result);
-           // myDispatcherTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                lblScore.Content = e.Result.Count() * e.Result[0].Count(); ;
-                lblTest.Content = ex.ToString();
-               
-            }
-            
+            updateBoard(e.Result, gameBoard);
         }
 
         private void WebService_DropBlockCompleted(object sender, DropBlockCompletedEventArgs e)
         {
             try
             {
-                updateBoard(e.Result);
+                updateBoard(e.Result, gameBoard);
             }
             catch (Exception ex)
             {
-                
-                 lblTest.Content = (ex.ToString());
+
+                lblTest.Content = (ex.ToString());
             }
         }
 
@@ -238,20 +220,19 @@ namespace TetrisClient
         {
             try
             {
-                updateBoard(e.Result);
+                updateBoard(e.Result, gameBoard);
             }
             catch (Exception ex)
             {
-
                 lblTest.Content = (ex.ToString());
             }
         }
 
-         private void WebService_MoveBlockRightCompleted(object sender, MoveBlockRightCompletedEventArgs e)
+        private void WebService_MoveBlockRightCompleted(object sender, MoveBlockRightCompletedEventArgs e)
         {
             try
             {
-                updateBoard(e.Result);
+                updateBoard(e.Result, gameBoard);
             }
             catch (Exception ex)
             {
@@ -260,32 +241,33 @@ namespace TetrisClient
             }
         }
 
-         private void WebService_RotateBlockCompleted(object sender, RotateBlockCompletedEventArgs e)
-         {
-             try
-             {
-                 updateBoard(e.Result);
-             }
-             catch (Exception ex)
-             {
+        private void WebService_RotateBlockCompleted(object sender, RotateBlockCompletedEventArgs e)
+        {
+            try
+            {
+                updateBoard(e.Result, gameBoard);
+            }
+            catch (Exception ex)
+            {
 
-                 lblTest.Content = (ex.ToString());
-             }
-         }
+                lblTest.Content = (ex.ToString());
+            }
+        }
 
-        private void webService_HelloWorldCompleted(object sender, HelloWorldCompletedEventArgs e)
+        private void WebService_GetScoreCompleted(object sender, GetScoreCompletedEventArgs e)
         {
             try
             {
                 lblScore.Content = e.Result.ToString();
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
 
-                lblTest.Content = (Ex.ToString()); 
+                lblTest.Content = (ex.ToString());
             }
-            
-            lblName.Content = "test";
         }
+
+        #endregion
+
     }
 }
