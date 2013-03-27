@@ -4,13 +4,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" x:Class="TetrisClient.MainPage"
-    mc:Ignorable="d" Height="691" KeyDown="UserControl_KeyDown_1" Width="871.284">
+    mc:Ignorable="d" Height="691" KeyDown="UserControl_KeyDown" Width="871.284">
 
     <Grid x:Name="LayoutRoot" Background="#FF514C4C" Margin="52,0,-91,-632">
-       
-       
-
-
         <sdk:Label x:Name="lblScore" HorizontalAlignment="Right" Height="86" VerticalAlignment="Top" Width="472" Margin="0,10,10,0" Foreground="#FFF4F4F5" Content="0" FontSize="70" FontFamily="Euphemia"/>
         <sdk:Label x:Name="lblName" HorizontalAlignment="Right" Height="51" VerticalAlignment="Top" Width="481" Margin="0,94,10,0" Foreground="#FFF4F4F5" Content="Simon" FontSize="35" FontFamily="Euphemia"/>
        
