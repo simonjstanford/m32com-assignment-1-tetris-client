@@ -28,7 +28,7 @@ namespace TetrisClient
         //board fields
         Rectangle[][] gameBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the game board
         Rectangle[][] nextShapeBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the next shape board
-        Point gameBoardLoction = new Point(6, 619); //The XY coords of the bottom left rectangle on the game board
+        int gameBoardLoctionX = 6; //The X coords of the bottom left rectangle on the game board
         Point nextShapeBoardLocation = new Point(284, 73); //The XY coords of the bottom left rectangle in the next shape board
         Boolean gameInProgress = true; //bool that shows if the game is in progress or not.  Used to stop key presses moving shapes when the game is over
 
@@ -73,7 +73,7 @@ namespace TetrisClient
             try
             {
                 //create the gameboard.  The numbers passed are the XY coords of the bottom left Rectangle object on the board.  All other rectangles are drawn in relation to that object
-                gameBoard = createBoard(e.Result, gameBoardLoction); 
+                gameBoard = createBoard(e.Result, new Point(gameBoardLoctionX, ((e.Result[0].Count() - 1) * 21)+ 10)); 
 
                 webService.GetNextShapeAsync(); //call the web service GetNextShape() method asynchronously
                 updateBoard(e.Result, gameBoard); //change the gameboard to display the new the board - this would be a blank board with one shape at the top
@@ -361,7 +361,7 @@ namespace TetrisClient
         /// <param name="e">Any arguments passed from the web service.  Contains the updated score.</param>
         private void WebService_GetGameStateCompleted(object sender, GetGameStateCompletedEventArgs e)
         {
-            if (!e.Result) //waiting for bug correction
+            if (e.Result)
             {
                 //if game is active, set local variable to true.  
                 //This variable is used by the KeyDown event in the UserControl_KeyDown() method to stop the player moving shapes if the game is over
