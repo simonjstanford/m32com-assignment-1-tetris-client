@@ -80,7 +80,7 @@ namespace TetrisClient
 
                 //instantiate and start the timer object that will tick every second
                 timer = new System.Windows.Threading.DispatcherTimer();  
-                timer.Interval = new TimeSpan(0, 0, 0, 0, 1000); // This sets the timer to tick every second (1000 milliseconds)
+                timer.Interval = new TimeSpan(0, 0, 0, 0, 500); // This sets the timer to tick every second (1000 milliseconds)
                 timer.Tick += new EventHandler(Each_Tick); //specify the method that will be executed on every tick
 
                 timer.Start();  //start the timer
@@ -254,7 +254,15 @@ namespace TetrisClient
         private void webService_MoveBlockDownCompleted(object sender, MoveBlockDownCompletedEventArgs e)
         {
             //update the game board with the array returned by the web service
-            updateBoard(e.Result, gameBoard);
+            try
+            {
+                updateBoard(e.Result, gameBoard);
+            }
+            catch (Exception ex)
+            {
+                lblTest.Content = (ex.ToString());
+            }
+            
         }
 
         /// <summary>
