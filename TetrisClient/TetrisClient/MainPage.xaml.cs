@@ -44,6 +44,8 @@ namespace TetrisClient
                 name = HtmlPage.Document.QueryString["Name"];
             lblName.Content = name;
 
+            Instructions.Text = "Left/right arrow keys for movement" + Environment.NewLine + "Up arrow key for rotate" + Environment.NewLine + "Down arrow key for drop";
+          
             //Add web service event handlers - web service calls in Silverlight are asynchronous
             webService.StartGameCompleted += new EventHandler<StartGameCompletedEventArgs>(webService_StartGameCompleted); //begins a new game, returns a new empty board
             webService.MoveBlockDownCompleted += new EventHandler<MoveBlockDownCompletedEventArgs>(webService_MoveBlockDownCompleted); //moves the active shape down one row.  Called every second by the timer
