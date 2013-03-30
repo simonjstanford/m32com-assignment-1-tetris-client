@@ -16,6 +16,8 @@ public partial class highscores : System.Web.UI.Page
         webService = new TetrisWebServiceSoapClient();
 
         DataTable dt = webService.GetHighScores();
+        dt.DefaultView.Sort = "Score desc";
+       // dt.DefaultView.ApplyDefaultSort(
         HighScoresGridView.DataSource = dt;
         HighScoresGridView.DataBind();
     }

@@ -11,7 +11,7 @@
     </hgroup>
 
     <article>
-        <asp:GridView ID="HighScoresGridView" runat="server" AllowSorting="True"></asp:GridView>
+        <asp:GridView ID="HighScoresGridView" runat="server"></asp:GridView>
     </article>
 
     <aside>
