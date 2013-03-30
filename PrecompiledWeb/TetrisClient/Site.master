@@ -1,10 +1,10 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="SiteMaster" %>
+﻿<%@ master language="C#" autoeventwireup="true" inherits="SiteMaster, App_Web_zmukkcst" %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
-    <title><%: Page.Title %> - M32COM Tetris Web Service Game</title>
+    <title><%: Page.Title %> - Internet Systems Development (M32COM) Tetris Web Service Game</title>
     <asp:PlaceHolder runat="server">      
         <%: Scripts.Render("~/bundles/modernizr") %>
     </asp:PlaceHolder>
