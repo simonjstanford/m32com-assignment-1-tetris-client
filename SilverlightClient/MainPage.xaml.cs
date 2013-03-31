@@ -27,7 +27,8 @@ namespace TetrisClient
 
         //board fields
         Rectangle[][] gameBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the game board
-        Rectangle[][] nextShapeBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the next shape board
+        Rectangle[][] nextShapeBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the next shape board 
+        
         int gameBoardLoctionX = 6; //The X coords of the bottom left rectangle on the game board
         Point nextShapeBoardLocation = new Point(284, 73); //The XY coords of the bottom left rectangle in the next shape board
         Boolean gameInProgress = true; //bool that shows if the game is in progress or not.  Used to stop key presses moving shapes when the game is over
@@ -90,7 +91,7 @@ namespace TetrisClient
 
                 timer.Start();  //start the timer
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //lblTest.Content = ex.ToString();
             }
@@ -201,7 +202,7 @@ namespace TetrisClient
                 else
                     updateBoard(e.Result, nextShapeBoard); //if the next shape board already exists, update it
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //lblTest.Content = (ex.ToString());
             }
@@ -279,7 +280,7 @@ namespace TetrisClient
             {
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //lblTest.Content = (ex.ToString());
             }
@@ -298,7 +299,7 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //lblTest.Content = (ex.ToString());
             }
@@ -316,7 +317,7 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                // lblTest.Content = (ex.ToString());
             }
@@ -334,7 +335,7 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //lblTest.Content = (ex.ToString());
@@ -353,7 +354,7 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //lblTest.Content = (ex.ToString());
@@ -372,7 +373,7 @@ namespace TetrisClient
                 //update the score label with the current score
                 lblScore.Content = e.Result.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //lblTest.Content = (ex.ToString());

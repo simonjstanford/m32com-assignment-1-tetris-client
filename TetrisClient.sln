@@ -21,13 +21,22 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TetrisClient", "TetrisClien
 		VWDPort = "12886"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetrisClient", "SilverlightClient\TetrisClient.csproj", "{29758170-062A-42DE-9355-A3D0E26814E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BD1CD094-E1CB-44CE-96CC-E69BEA7C300D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD1CD094-E1CB-44CE-96CC-E69BEA7C300D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD1CD094-E1CB-44CE-96CC-E69BEA7C300D}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD1CD094-E1CB-44CE-96CC-E69BEA7C300D}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{29758170-062A-42DE-9355-A3D0E26814E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29758170-062A-42DE-9355-A3D0E26814E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29758170-062A-42DE-9355-A3D0E26814E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29758170-062A-42DE-9355-A3D0E26814E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
