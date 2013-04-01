@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Windows;
+using System.Windows.Browser;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Windows.Browser;
-using TetrisClient.TetrisWebService;
+using SilverlightClient.TetrisWebService;
 
-namespace TetrisClient
+namespace SilverlightClient
 {
-    /// <summary>
+    // <summary>
     /// A Silverlight front-end for the Tetris web service.  Creates and updates a game board using the web service at http://www.simonjstanford.co.uk/tetriswebservice/TetrisWebService.asmx.  Supports shape left/right/rotate movement, high scores and displays the next shape coming.
     /// </summary>
     public partial class MainPage : UserControl
@@ -28,7 +27,7 @@ namespace TetrisClient
         //board fields
         Rectangle[][] gameBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the game board
         Rectangle[][] nextShapeBoard; //Jagged array to hold a group the Rectangle objects that are displayed in the browser and represent the next shape board 
-        
+
         int gameBoardLoctionX = 6; //The X coords of the bottom left rectangle on the game board
         Point nextShapeBoardLocation = new Point(284, 73); //The XY coords of the bottom left rectangle in the next shape board
         Boolean gameInProgress = true; //bool that shows if the game is in progress or not.  Used to stop key presses moving shapes when the game is over
@@ -49,7 +48,7 @@ namespace TetrisClient
             lblName.Content = name;
 
             Instructions.Text = "Left/right arrow keys for movement" + Environment.NewLine + "Up arrow key for rotate" + Environment.NewLine + "Down arrow key for drop";
-          
+
             //Add web service event handlers - web service calls in Silverlight are asynchronous
             webService.StartGameCompleted += new EventHandler<StartGameCompletedEventArgs>(webService_StartGameCompleted); //begins a new game, returns a new empty board
             webService.MoveBlockDownCompleted += new EventHandler<MoveBlockDownCompletedEventArgs>(webService_MoveBlockDownCompleted); //moves the active shape down one row.  Called every second by the timer
@@ -60,8 +59,8 @@ namespace TetrisClient
             webService.GetScoreCompleted += new EventHandler<GetScoreCompletedEventArgs>(WebService_GetScoreCompleted); //every second, an updated score is retrieved from the web service by the timer
             webService.GetNextShapeCompleted += new EventHandler<GetNextShapeCompletedEventArgs>(WebService_GetNextShapeCompleted); //every second, the next shape that will appear on the board is drawn in a separate grid
             webService.GetGameStateCompleted += new EventHandler<GetGameStateCompletedEventArgs>(WebService_GetGameStateCompleted); //every second, the client will check if it is game over.
-            webService.SubmitScoreCompleted += new EventHandler<System.ComponentModel.AsyncCompletedEventArgs>(WebService_SubmitScoreCompleted);  //when game state is false (i.e. game over), then the score is posted to the web service.
-           
+            webService.SubmitScoreCompleted += new EventHandler<SubmitScoreCompletedEventArgs>(WebService_SubmitScoreCompleted); //new EventHandler<System.ComponentModel.AsyncCompletedEventArgs>(WebService_SubmitScoreCompleted);  //when game state is false (i.e. game over), then the score is posted to the web service.
+
             //Start the game
             webService.StartGameAsync(name);
         }
@@ -79,21 +78,21 @@ namespace TetrisClient
             try
             {
                 //create the gameboard.  The numbers passed are the XY coords of the bottom left Rectangle object on the board.  All other rectangles are drawn in relation to that object
-                gameBoard = createBoard(e.Result, new Point(gameBoardLoctionX, ((e.Result[0].Count() - 1) * 21)+ 10)); 
+                gameBoard = createBoard(e.Result, new Point(gameBoardLoctionX, ((e.Result[0].Count() - 1) * 21) + 10));
 
                 webService.GetNextShapeAsync(); //call the web service GetNextShape() method asynchronously
                 updateBoard(e.Result, gameBoard); //change the gameboard to display the new the board - this would be a blank board with one shape at the top
 
                 //instantiate and start the timer object that will tick every second
-                timer = new System.Windows.Threading.DispatcherTimer();  
+                timer = new System.Windows.Threading.DispatcherTimer();
                 timer.Interval = new TimeSpan(0, 0, 0, 0, interval); // This sets the timer to tick every second
                 timer.Tick += new EventHandler(Each_Tick); //specify the method that will be executed on every tick
 
                 timer.Start();  //start the timer
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //lblTest.Content = ex.ToString();
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -153,7 +152,7 @@ namespace TetrisClient
                 {
                     Rectangle rectangle = new Rectangle(); //create a new Rectangle object
                     //Assign the relevant properties
-                    rectangle.Fill = getBrush("e2e2e2"); 
+                    rectangle.Fill = getBrush("e2e2e2");
                     rectangle.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                     rectangle.Height = 20;
                     rectangle.Stroke = getBrush("e2e2e2");
@@ -202,9 +201,9 @@ namespace TetrisClient
                 else
                     updateBoard(e.Result, nextShapeBoard); //if the next shape board already exists, update it
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -251,7 +250,7 @@ namespace TetrisClient
                 case Key.Left:
                     //If the game is in progess, move the active shape left
                     if (gameInProgress)
-                     webService.MoveBlockLeftAsync();
+                        webService.MoveBlockLeftAsync();
                     break;
                 case Key.Right:
                     //If the game is in progess, move the active shape right
@@ -280,11 +279,11 @@ namespace TetrisClient
             {
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
-            
+
         }
 
         /// <summary>
@@ -299,9 +298,9 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -317,9 +316,9 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-               // lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -335,10 +334,9 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -354,10 +352,9 @@ namespace TetrisClient
                 //update the game board with the array returned by the web service
                 updateBoard(e.Result, gameBoard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -373,10 +370,9 @@ namespace TetrisClient
                 //update the score label with the current score
                 lblScore.Content = e.Result.ToString();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                //lblTest.Content = (ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -395,7 +391,7 @@ namespace TetrisClient
             {
                 //if game is active, set local variable to true.  
                 //This variable is used by the KeyDown event in the UserControl_KeyDown() method to stop the player moving shapes if the game is over
-                gameInProgress = true; 
+                gameInProgress = true;
             }
             else
             {
@@ -417,11 +413,13 @@ namespace TetrisClient
         /// </summary>
         /// <param name="sender">The calling object</param>
         /// <param name="e">Any arguments passed from the web service.  Contains the updated score.</param>
-        private void WebService_SubmitScoreCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        private void WebService_SubmitScoreCompleted(object sender, SubmitScoreCompletedEventArgs e)
         {
-            //do nothing yet
+            if (e.Result)
+            {
+                MessageBox.Show("You got a high Score! Visit the high scores page to see your ranking.");
+            }
         }
-
         #endregion
     }
 }

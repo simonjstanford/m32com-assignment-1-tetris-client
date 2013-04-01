@@ -3,15 +3,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" x:Class="TetrisClient.MainPage"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" x:Class="SilverlightClient.MainPage"
     mc:Ignorable="d" Height="697" KeyDown="UserControl_KeyDown" Width="871.284">
 
     <Grid x:Name="LayoutRoot" Background="#FF7AC0DA" Margin="0,0,-91,10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="161*"/>
-        </Grid.RowDefinitions>
         <sdk:Label x:Name="lblScore" HorizontalAlignment="Right" Height="86" VerticalAlignment="Top" Width="472" Margin="0,10,10,0" Foreground="White" Content="0" FontSize="70" FontFamily="Euphemia"/>
-        <sdk:Label x:Name="lblName" HorizontalAlignment="Right" Height="51" VerticalAlignment="Top" Width="481" Margin="0,94,10,0" Foreground="White" Content="Simon" FontSize="35" FontFamily="Euphemia"/>
+        <sdk:Label x:Name="lblName" HorizontalAlignment="Right" Height="51" VerticalAlignment="Top" Width="481" Margin="0,94,10,0" Foreground="White" Content="Bob" FontSize="35" FontFamily="Euphemia"/>
         <TextBlock x:Name="Instructions" HorizontalAlignment="Right" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="0,150,10,0" Height="206" Width="359" TextAlignment="Right" Foreground="White" Grid.RowSpan="3"/>
     </Grid>
 </UserControl>
