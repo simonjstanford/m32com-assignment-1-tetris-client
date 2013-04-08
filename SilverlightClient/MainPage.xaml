@@ -10,5 +10,6 @@
         <sdk:Label x:Name="lblScore" HorizontalAlignment="Right" Height="86" VerticalAlignment="Top" Width="472" Margin="0,10,10,0" Foreground="White" Content="0" FontSize="70" FontFamily="Euphemia"/>
         <sdk:Label x:Name="lblName" HorizontalAlignment="Right" Height="51" VerticalAlignment="Top" Width="481" Margin="0,94,10,0" Foreground="White" Content="Bob" FontSize="35" FontFamily="Euphemia"/>
         <TextBlock x:Name="Instructions" HorizontalAlignment="Right" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="0,150,10,0" Height="206" Width="359" TextAlignment="Right" Foreground="White" Grid.RowSpan="3"/>
+        <Button x:Name="buttonPause" Content="Pause" HorizontalAlignment="Left" Margin="877,643,0,0" VerticalAlignment="Top" Width="75" Click="buttonPause_Click"/>
     </Grid>
 </UserControl>

@@ -421,5 +421,19 @@ namespace SilverlightClient
             }
         }
         #endregion
+
+        private void buttonPause_Click(object sender, RoutedEventArgs e)
+        {
+            if (timer.IsEnabled)
+            {
+                timer.Stop();
+                buttonPause.Content = "Resume";
+            }
+            else
+            {
+                timer.Start();
+                buttonPause.Content = "Pause";
+            }
+        }
     }
 }
