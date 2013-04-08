@@ -244,22 +244,22 @@ namespace SilverlightClient
             {
                 case Key.Down:
                     //If the game is in progess, move the active shape to the bottom of the board 
-                    if (gameInProgress)
+                    if (gameInProgress && timer.IsEnabled)
                         webService.DropBlockAsync();
                     break;
                 case Key.Left:
                     //If the game is in progess, move the active shape left
-                    if (gameInProgress)
+                    if (gameInProgress && timer.IsEnabled)
                         webService.MoveBlockLeftAsync();
                     break;
                 case Key.Right:
                     //If the game is in progess, move the active shape right
-                    if (gameInProgress)
+                    if (gameInProgress && timer.IsEnabled)
                         webService.MoveBlockRightAsync();
                     break;
                 case Key.Up:
                     //If the game is in progess, rotate the active shape clockwise
-                    if (gameInProgress)
+                    if (gameInProgress && timer.IsEnabled)
                         webService.RotateBlockAsync();
                     break;
                 default:
