@@ -422,13 +422,20 @@ namespace SilverlightClient
         }
         #endregion
 
+        /// <summary>
+        /// Pauses the game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonPause_Click(object sender, RoutedEventArgs e)
         {
+            //if the game is playing, then pause
             if (timer.IsEnabled)
             {
                 timer.Stop();
                 buttonPause.Content = "Resume";
             }
+            //else, resume
             else
             {
                 timer.Start();
